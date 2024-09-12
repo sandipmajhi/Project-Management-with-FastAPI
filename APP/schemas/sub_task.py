@@ -22,6 +22,8 @@ def SubTaskEntity(item) -> dict:
         "task":item["task"],
         "start_date":item["start_date"],
         "end_date":item["end_date"],
+        "start_time":item.get("start_time", None),
+        "end_time":item.get("end_time", None),
         "created_by":item["created_by"]
 
     }
@@ -58,6 +60,8 @@ def AssignSubTaskEntities(entities) -> list:
         response2["username"] = user["name"]
         response2["start_date"] = sub_task["start_date"]
         response2["end_date"] = sub_task["end_date"]
+        response2["start_time"] = sub_task["start_time"]
+        response2["end_time"] = sub_task["end_time"]
         final_response.append(response2)
 
     return final_response
@@ -87,6 +91,8 @@ def AssignSubTaskEntitiesD(entities) -> list:
         response2["username"] = user["name"]
         response2["start_date"] = sub_task["start_date"]
         response2["end_date"] = sub_task["end_date"]
+        response2["start_time"] = sub_task["start_time"]
+        response2["end_time"] = sub_task["end_time"]
         final_response.append(response2)
 
     return final_response

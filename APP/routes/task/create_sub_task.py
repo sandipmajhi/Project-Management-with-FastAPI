@@ -20,8 +20,6 @@ async def CreateSubTask(subTask: SubTask, current_user: dict = Depends(get_curre
         return JSONResponse(content={"error":"You do not have enough permissions"}, status_code=status.HTTP_403_FORBIDDEN)
     
     try:
-    
-        print(subTask)
 
         try:
             subTask = dict(subTask)

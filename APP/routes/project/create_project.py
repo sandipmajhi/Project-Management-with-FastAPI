@@ -39,6 +39,6 @@ async def CreateProject(project: Project, current_user: dict = Depends(get_curre
         response = ProjectEntity(conn.local.project.find_one(ObjectId(project_object.inserted_id)))
         return JSONResponse(content=response, status_code=status.HTTP_200_OK)
     except:
-        JSONResponse(content={"error": "Project not created"}, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(content={"error": "Project not created"}, status_code=status.HTTP_400_BAD_REQUEST)
     
 

@@ -29,6 +29,9 @@ async def CreateTask(Task: Task, current_user: dict = Depends(get_current_user))
             Task["created_by"] = current_user.id
             task_object = conn.local.task.insert_one(Task)
         except Exception as e:
+            x = conn.local.task.list_indexes()
+            for index in x:
+                print(index)
             return JSONResponse(content={"error": f'Task Not Created {e}'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
 

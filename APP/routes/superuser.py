@@ -1,5 +1,6 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 from models.user import User
+from routes.user import get_current_user
 from config.db import conn
 from bson import ObjectId
 from schemas.user import userEntity, usersEntity
@@ -8,6 +9,7 @@ from auth.auth_handler import sign_jwt, decode_jwt
 from passlib.context import CryptContext
 from password_manager.password import hash_password, verify_password
 from fastapi.responses import JSONResponse
+from permissions.permissions import check_permissions
 
 
 
@@ -17,7 +19,12 @@ superuser = APIRouter()
 
 
 @superuser.post('/create_superuser', tags=["Create Superuser"])
-async def createsuperuser(user: User):
+async def createsuperuser(user: User, current_user: dict = Depends(get_current_user)):
+    try: 
+        check_permissions(["admin"], str(current_user.id))
+    except:
+        JSONResponse(content={"error": "Premission Denided"}, status_code=status.HTTP_403_FORBIDDEN)
+    
     try:
         user.is_superuser = True
         user.password = hash_password(user.password)

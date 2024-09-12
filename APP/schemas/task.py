@@ -21,6 +21,8 @@ def TaskEntity(item) -> dict:
         "project":item["project"],
         "start_date":item["start_date"],
         "end_date":item["end_date"],
+        "start_time":item.get("start_time", None),
+        "end_time":item.get("end_time", None),
         "created_by":item["created_by"]
 
     }
@@ -54,6 +56,8 @@ def AssignTaskEntities(entities) -> list:
         response2["username"] = user["name"]
         response2["start_date"] = task["start_date"]
         response2["end_date"] = task["end_date"]
+        response2["start_time"] = task["start_time"]
+        response2["end_time"] = task["end_time"]
         final_response.append(response2)
 
     return final_response

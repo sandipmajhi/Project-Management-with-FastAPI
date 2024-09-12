@@ -12,6 +12,8 @@ class Task(BaseModel):
     project: str
     start_date: str
     end_date: str
+    start_time: str
+    end_time: str
 
 class AssignTask(BaseModel):
     task: str

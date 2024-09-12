@@ -60,6 +60,7 @@ async def user_login(login_credentials:UserLoginSchema):
         if token_found is not None:       
             token = sign_jwt(str(user["_id"]))
             token.update({"user":str(user["_id"])})    
+            token.update({"role":str(user["role"])})    
             conn.local.tokens.update_one({"user":str(user["_id"])},{"$set":{"access_token":token["access_token"],"refresh_token":token["refresh_token"]}})
             return JSONResponse(content=token, status_code=status.HTTP_200_OK)
         

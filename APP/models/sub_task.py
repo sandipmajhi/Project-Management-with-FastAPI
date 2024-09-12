@@ -12,6 +12,8 @@ class SubTask(BaseModel):
     task: str
     start_date: str
     end_date: str
+    start_time: str
+    end_time: str
 
 class AssignSubTask(BaseModel):
     sub_task: str

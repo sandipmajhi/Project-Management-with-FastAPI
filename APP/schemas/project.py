@@ -15,9 +15,12 @@ def ProjectEntity(item) -> dict:
     return {
         "project_id":str(item["_id"]),
         "project_name":item["project_name"],
+        "project_description": item.get("project_description", None),
         "project_code":item["project_code"],
         "project_start_date":item["start_date"],
-        "project_end_date":item["end_date"]
+        "project_end_date":item["end_date"],
+        "project_start_time":item.get("start_time",None),
+        "project_end_time":item.get("end_time", None)
 
     }
 
@@ -30,7 +33,7 @@ def AssignEntity(item) -> dict:
     item = convert_objectid_to_str(item)
     
     return {
-        "project_id": item.get("project", []),
+        "project_id": item.get("project", ""),
         "empa": str(item.get("empa_user", ""))
     }
 

@@ -24,6 +24,8 @@ async def EmpsRegister(user: User, current_user: dict = Depends(get_current_user
     try:
         user.password = hash_password(user.password)
         user = dict(user)
+        if user["email"]=="":
+            return JSONResponse(content={"error":"email is required"}, status_code=status.HTTP_206_PARTIAL_CONTENT)
         user.update({"permissions":"emps"})
         user.update({"role":"Level S"})
 

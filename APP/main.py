@@ -7,6 +7,7 @@ from routes.project import project_router
 
 from routes.task import task_router
 
+
 app = FastAPI()
 
 

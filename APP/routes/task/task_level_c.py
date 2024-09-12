@@ -19,8 +19,16 @@ async def AssignTask_LevelC(assigntask: AssignTask, current_user: dict = Depends
     if current_user.permissions == "empb":
         try:
             task_found = conn.local.sub_task.find_one(ObjectId(assigntask.task))
+
             try:
-                already_assigned = conn.local.assigned_task_empc.find_one({"task":assigntask.task})
+                user_entity = conn.local.empb.find_one({"user":ObjectId(assigntask.user)})
+                if user_entity is None:
+                    return JSONResponse(content={"message": "User not found"}, status_code=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return JSONResponse(content={"error":f"{e}"}, status_code=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                already_assigned = conn.local.assigned_task_empc.find_one({"task":assigntask.task,  "user":assigntask.user})
                 if already_assigned is not None:
                     return JSONResponse(content={"error":"task already assigned"}, status_code=status.HTTP_400_BAD_REQUEST)
                 try:
@@ -50,6 +58,8 @@ async def AssignTask_LevelC(assigntask: AssignTask, current_user: dict = Depends
                         final_response["username"] = user["name"]
                         final_response["start_date"] = sub_task["start_date"]
                         final_response["end_date"] = sub_task["end_date"]
+                        final_response["start_time"] = sub_task["start_time"]
+                        final_response["end_time"] = sub_task["end_time"]
                         
                         final_response.update({"status":"Sub Task assigned successfully"})
                         return JSONResponse(content=final_response, status_code=status.HTTP_200_OK)
