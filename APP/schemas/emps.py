@@ -14,6 +14,7 @@ def EmpsEntity(item) -> dict:
         return {
             "emps_id": str(item["_id"]),
             "user_id": str(related_data["id"]),
+            "mozi_id": str(related_data["mozi_id"]),
             "name": related_data["name"],
             "role": related_data["role"],
             "email": related_data["email"]
@@ -21,6 +22,7 @@ def EmpsEntity(item) -> dict:
     except:
         return {
             "empa_id": None,
+            "mozi_id": None,
             "name": None,
             "role": None,
             "email": None

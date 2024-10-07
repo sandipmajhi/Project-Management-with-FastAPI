@@ -1,3 +1,5 @@
+#  =================================Created by Sandip 27-09-2024======================================
+#          ======================================  ======================================
 from fastapi import APIRouter, Body, Depends, security, HTTPException, status
 from models.user import UserLoginSchema, PyUser
 from config.db import conn
@@ -7,6 +9,7 @@ from auth.auth_bearer import JWTBearer
 from auth.auth_handler import sign_jwt, decode_jwt
 from password_manager.password import verify_password
 from models.token import Token
+from schemas.user import userEntity, usersEntity
 
 
 user = APIRouter()
@@ -41,7 +44,9 @@ def get_current_user(token: str = Depends(JWTBearer())) -> PyUser:
     # Create and return a PyUser instance based on MongoDB data
     return PyUser(
         id=str(user_data["_id"]),
+        mozi_id=user_data["mozi_id"],
         role=user_data["role"],
+        name=user_data["name"],
         permissions=user_data["permissions"]
     )
 
@@ -76,4 +81,15 @@ async def user_logout(token:str = Depends(JWTBearer())):
     if deleted_token.deleted_count == 0:
         return JSONResponse(content={"error":"token not found!"}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message":"logout successful"}, status_code=status.HTTP_200_OK)
+
+
+@user.get("/get_all_users", dependencies=[Depends(JWTBearer())], tags=["Get All Users"])
+async def get_all_users(current_user: dict = Depends(get_current_user)):
+    try:
+        users = usersEntity(conn.local.user.find())
+        if users is None:
+            return JSONResponse(content={"error":"No users found"}, status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse(content=users, status_code=status.HTTP_200_OK)
+    except Exception as e:
+        return JSONResponse(content={"error":str(e)}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     

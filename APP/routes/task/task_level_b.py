@@ -27,6 +27,7 @@ async def AssignTask_LevelB(assigntask: AssignTask, current_user: dict = Depends
 
             try:
                 already_assigned = conn.local.assigned_task_empb.find_one({"task":assigntask.task, "user":assigntask.user})
+                print("\n\n\n\n",already_assigned,"\n\n\n")
                 if already_assigned is not None:
                     return JSONResponse(content={"error":"this task already assigned to this user"}, status_code=status.HTTP_400_BAD_REQUEST)
                 try:
@@ -71,7 +72,7 @@ async def ViewTask_LevelB(current_user: dict = Depends(get_current_user)):
             response = AssignTaskEntities(conn.local.assigned_task_empb.find({"assigned_by":str(current_user.id)}))
             print(response)
             return JSONResponse(content=response, status_code=status.HTTP_200_OK)
-        except:
+        except Exception as e:
             return JSONResponse(content={"error":f"something went wrong {e}"}, status_code=status.HTTP_400_BAD_REQUEST)
             
     elif current_user.permissions == "empb":

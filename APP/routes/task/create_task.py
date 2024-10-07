@@ -27,6 +27,13 @@ async def CreateTask(Task: Task, current_user: dict = Depends(get_current_user))
         try:
             Task = dict(Task)
             Task["created_by"] = current_user.id
+            # ===============Not added to production server code===================Please ADD Later======================
+# { from here 
+            assigned_to_this_user = conn.local.assign.find_one({"empa_user":current_user.id, "project":Task["project"]})
+
+            if assigned_to_this_user is None:
+                return JSONResponse(content={"error":"you are not assigned to this project"}, status_code=status.HTTP_400_BAD_REQUEST)
+# to here }
             task_object = conn.local.task.insert_one(Task)
         except Exception as e:
             x = conn.local.task.list_indexes()

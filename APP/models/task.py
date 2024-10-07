@@ -19,4 +19,7 @@ class AssignTask(BaseModel):
     task: str
     user: str
 
+class Date(BaseModel):
+    date:str
+
 

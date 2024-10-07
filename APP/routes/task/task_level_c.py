@@ -20,8 +20,11 @@ async def AssignTask_LevelC(assigntask: AssignTask, current_user: dict = Depends
         try:
             task_found = conn.local.sub_task.find_one(ObjectId(assigntask.task))
 
+            
+
+
             try:
-                user_entity = conn.local.empb.find_one({"user":ObjectId(assigntask.user)})
+                user_entity = conn.local.empc.find_one({"user":ObjectId(assigntask.user)})
                 if user_entity is None:
                     return JSONResponse(content={"message": "User not found"}, status_code=status.HTTP_404_NOT_FOUND)
             except Exception as e:

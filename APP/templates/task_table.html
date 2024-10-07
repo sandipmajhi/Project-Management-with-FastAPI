@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataTable with API Pagination</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include DataTables CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        #search-container {
+            margin-bottom: 20px;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .content.collapsed {
+            margin-left: 0;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 40vh;
+            width: 40vw;
+        }
+
+        
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .content {
+                margin-left: 200px;
+            }
+
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+
+            .content.collapsed {
+                margin-left: 0;
+            }
+        }
+
+        @media screen and (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .sidebar.collapsed {
+                position: absolute;
+                height: 100vh;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .content.collapsed {
+                margin-left: 0;
+            }
+
+            .chart-container {
+                width: 90vw;
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" id="toggle-sidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Dashboard</a>
+    </nav>
+
+    <div class="sidebar" id="sidebar">
+        <h2 class="text-white text-center">Menu</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('Index') }}">Home</a>
+            </li>
+            {% if not token %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('Login') }}">Login</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="#">Messages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Settings</a>
+            </li>
+            {% if token %}
+            <li class="nav-item"></li>
+            <a class="nav-link" id="logout" href="{{url_for('Logout')}}">Logout</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="content">
+        <h1>Task List</h1>
+
+        <div id="search-container">
+            <input type="text" id="search-input" class="form-control" placeholder="Search..." style="width: 20%;">
+            <button id="search-button" class="btn btn-primary mt-2">Search</button>
+        </div>
+        <div class="text-right my-3">
+            <button class="btn btn-success" id="download-excel">
+                <i class="fas fa-file-excel"></i> Download as Excel
+            </button>
+        </div>
+        <div id="table-div" style="max-width: 100%; overflow-x: scroll">
+            <table id="project_table" class="display table table-striped table-bordered" style="width: 200%">
+                <thead>
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Task Name</th>
+                        <th>Task Description</th>
+                        <th>Project Name</th>
+                        <th>Task Owner Name</th>
+                        <th>Assigned Users</th>
+                        <th>Start Date & Time</th>
+                        <th>Target End Date & Time</th>
+                        <th>Target Duration</th>
+                        <th>Actual End Date & Time</th>
+                        <th>Actual Duration</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here from the API -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            const accessToken = '{{ token }}';  // Make sure to replace or set your token accordingly
+            var table = $('#project_table').DataTable({
+                "ajax": {
+                    "url": "http://13.234.238.178/show_task_admin", // Your API endpoint
+                    "dataSrc": "",
+                    "headers": {
+                        "Authorization": "Bearer " + accessToken // Set the Authorization header with the token
+                    },
+                },
+                "columns": [
+                    { "data": "project" },                  // Project ID
+                    { "data": "task_name" },                // Task Name
+                    { "data": "task_description" },                // Task Name
+                    { "data": "project_name" },              // Project Name
+                    { "data": "task_owner_name" },          // Task Owner Name
+                    {
+                        "data": "assigned",                  // Assigned Users
+                        "render": function (data) {
+                            return data.join(", ");         // Join array into a comma-separated string
+                        }
+                    },
+                    { "data": "start_date_and_time" },      // Start Date & Time
+                    { "data": "target_end_date_and_time" }, // Target End Date & Time
+                    { "data": "target_duration" },
+                    { "data": "actual_end_date_and_time" },
+                    { "data": "actual_duration" },
+                    { "data": "status" },                     // Status
+                    { "data": "remarks" }                     // Status
+                ],
+                "pageLength": 10, // Maximum rows per page
+                "lengthMenu": [10], // Show only the option for 10 rows per page
+                "pagingType": "simple", // Simple pagination with next/prev buttons
+                "language": {
+                    "paginate": {
+                        "previous": "Previous",
+                        "next": "Next"
+                    }
+                }
+            });
+
+            $('#search-button').on('click', function () {
+                var searchTerm = $('#search-input').val();
+                const accessToken = '{{ token }}';
+                // Update the DataTable to fetch data based on the search term
+                $.ajax({
+                    url: "http://13.234.238.178/tasks_by_date",
+                    method: "POST", // Use POST method
+                    contentType: "application/json", // Specify content type as JSON
+                    data: JSON.stringify({ date: searchTerm }), // Send the date in JSON format
+                    headers: {
+                        "Authorization": "Bearer " + accessToken // Include the access token
+                    },
+                    success: function (data) {
+                        table.clear().rows.add(data).draw(); // Clear and add new data to the table
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", error);
+                    }
+                });
+            });
+
+            document.getElementById('download-excel').addEventListener('click', function () {
+                // Convert table to a worksheet
+                const table = document.getElementById('project_table');
+                const workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+                // Generate a binary string representation of the workbook
+                XLSX.writeFile(workbook, 'Task_Details.xlsx');
+            });
+
+
+            // Your custom scripts can go here
+            $('#logout').on('click', function (event) {
+                event.preventDefault();
+
+                const accessToken = '{{token}}'
+                const confirmLogout = confirm("Are you sure you want to log out?")
+                if (confirmLogout === true) {
+                    $.ajax({
+                        url: "http://localhost:8000/pages/logout", // Replace with your actual logout endpoint
+                        type: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + accessToken // If required, include the authorization token
+                        },
+                        success: function (response) {
+                            // Handle successful logout
+                            alert("Logged out successfully!");
+                            
+
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle errors
+                            
+                            window.location.href = "login";
+                        }
+                    });
+                }
+
+            })
+
+
+
+        });
+
+
+        // Toggle Sidebar
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('content');
+
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        });
+
+
+    </script>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.2.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+</body>
+
+</html>

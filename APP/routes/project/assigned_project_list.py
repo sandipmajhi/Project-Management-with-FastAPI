@@ -27,6 +27,8 @@ async def AssignedProjectList(current_user: dict = Depends(get_current_user)):
                 assigned_project[index]["project_code"] = project["project_code"]
                 assigned_project[index]["project_start_date"] = project["project_start_date"]
                 assigned_project[index]["project_end_date"] = project["project_end_date"]
+                assigned_project[index]["project_start_time"] = project["project_start_time"]
+                assigned_project[index]["project_end_time"] = project["project_end_time"]
 
 
 
@@ -69,6 +71,8 @@ async def AssignedProjectList(current_user: dict = Depends(get_current_user)):
                 assigned_project[index]["project_code"] = project["project_code"]
                 assigned_project[index]["project_start_date"] = project["project_start_date"]
                 assigned_project[index]["project_end_date"] = project["project_end_date"]
+                assigned_project[index]["project_start_time"] = project["project_start_time"]
+                assigned_project[index]["project_end_time"] = project["project_end_time"]
             
             # empa_user = userEntity(conn.local.user.find_one(ObjectId(assigned_project["empa"])))
             # project_name_list = []

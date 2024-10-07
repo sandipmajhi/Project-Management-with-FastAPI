@@ -2,6 +2,7 @@ from bson import ObjectId
 from config.db import conn
 from schemas.user import userEntity
 from schemas.project import ProjectEntity
+import copy
 
 def convert_objectid_to_str(item):
     """Convert ObjectId fields in the item to string."""
@@ -46,9 +47,15 @@ def AssignTaskEntities(entities) -> list:
     for item in entities:
         response1 = AssignTaskEntity(item)
         response2 = {}
-        task = TaskEntity(conn.local.task.find_one(ObjectId(response1["task_id"])))
-        project = ProjectEntity(conn.local.project.find_one(ObjectId(task["project"])))
-        user = userEntity(conn.local.user.find_one(ObjectId(response1["user_id"])))
+        try:
+            task = TaskEntity(conn.local.task.find_one(ObjectId(response1["task_id"])))
+            print("sandip",task)
+            project = ProjectEntity(conn.local.project.find_one(ObjectId(task["project"])))
+            print("sandip",project)
+            user = userEntity(conn.local.user.find_one(ObjectId(response1["user_id"])))
+            print("sandip",user)
+        except:
+            return final_response
         response2["task_id"] = task["task_id"]
         response2["task_name"] = task["task_name"]
         response2["created_by"] = task["created_by"]
@@ -58,6 +65,71 @@ def AssignTaskEntities(entities) -> list:
         response2["end_date"] = task["end_date"]
         response2["start_time"] = task["start_time"]
         response2["end_time"] = task["end_time"]
+
         final_response.append(response2)
 
+    return final_response
+
+
+
+def AdminTaskEntity(item) -> dict:
+    # Convert ObjectId to string if present
+    item = convert_objectid_to_str(item)
+    
+    return {
+        "id":str(item["_id"]),
+        "task_name":str(item["task_name"]),
+        "project":item["project"],
+        "task_description":item["task_description"],
+        "dependency":item["dependency"],
+        "status":item.get("status",None),
+        "task_owner":item["task_owner"],
+        "assigned":item.get("assigned",[]),
+        "start_date_and_time":item["start_date_and_time"],
+        "target_end_date_and_time":item["target_end_date_and_time"],
+        "target_duration":item["target_duration"],
+        "actual_end_date_and_time":item.get("actual_end_date_and_time",None),
+        "actual_duration":item.get("actual_duration",None),
+        "remarks":item.get("remarks",None),
+        "created_by":item.get("created_by",None)
+
+    }
+
+def AdminTaskEntities(entities) -> list:
+    final_response = []
+    users = []
+    
+    for item in entities:
+        response1 = AdminTaskEntity(item)
+        p_id = ObjectId(response1["project"])
+        project = ProjectEntity(conn.local.project.find_one({"_id":p_id}))
+        response1["project_name"] = project["project_name"]
+        owner_id = ObjectId(response1["task_owner"])
+        owner = userEntity(conn.local.user.find_one({"_id":owner_id}))
+        response1["task_owner_name"] = owner["name"]
+        assigned_user_ids = response1["assigned"]
+        # assigned = userEntity(conn.local.user.find_one({"_id":assigned_id}))
+        # response1["assigned_user_name"] = assigned["name"]
+        print(assigned_user_ids)
+        for assigned_user in assigned_user_ids:
+            # Fetch assigned user from the database
+            assigned_user = ObjectId(assigned_user)
+            user = conn.local.user.find_one({"_id": assigned_user})
+            if user is None:
+                users.append("")
+            else:
+                users.append(user["name"])
+
+            
+        
+        response1["assigned"] = users
+        print(response1["assigned"])
+        created_id = ObjectId(response1["created_by"])
+        created = userEntity(conn.local.user.find_one({"_id":created_id}))
+        response1["created_by"] = created["name"]
+        list_of_response = copy.deepcopy(response1)
+        final_response.append(list_of_response)
+
+        response1["assigned"].clear()
+    
     return final_response

@@ -6,6 +6,7 @@ from datetime import date, datetime
 class User(BaseModel):
     __tablename__ = 'user'
     name: str
+    mozi_id:str
     email: EmailStr 
     is_superuser: bool = False
     created_at: date = Field(default_factory=datetime.now)
@@ -13,7 +14,9 @@ class User(BaseModel):
 
 class PyUser(BaseModel):
     id: str
+    mozi_id:str
     role: str
+    name: str
     permissions: str
 
 

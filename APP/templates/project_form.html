@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mozi Tronics | Create Project</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .content.collapsed {
+            margin-left: 0;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-heading {
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 10px;
+            margin: 30px auto;
+        }
+
+        .card-header {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            font-size: 1.2em;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .form-control:focus {
+            border-color: #495057;
+            box-shadow: none;
+        }
+
+        .input-group-text {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: #343a40;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #495057;
+        }
+
+        .selected {
+            background-color: #0aa879;
+            color: white;
+        }
+
+        .required:after {
+            content: "*";
+            color: red;
+            padding-left: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .content {
+                margin-left: 200px;
+            }
+
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+
+            .content.collapsed {
+                margin-left: 0;
+            }
+        }
+
+        @media screen and (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .sidebar.collapsed {
+                position: absolute;
+                height: 100vh;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .content.collapsed {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" id="toggle-sidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Dashboard</a>
+    </nav>
+
+    <div class="sidebar" id="sidebar">
+        <h2 class="text-white text-center">Menu</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('Index') }}">Home</a>
+            </li>
+            {% if not token %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('Login') }}">Login</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="#">Messages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Settings</a>
+            </li>
+            {% if token %}
+            <li class="nav-item"></li>
+            <a class="nav-link" id="logout" href="{{url_for('Logout')}}">Logout</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+        <div class="container">
+            <div class="form-container mx-auto my-5 col-md-8 col-lg-6">
+                <div class="form-heading">
+                    <h3>Create a New Project</h3>
+                </div>
+                <form action="{{ url_for('Project') }}" method="post">
+                    <div class="form-group">
+                        <label for="project_name" class="form-label">Project Name:</label>
+                        <input type="text" class="form-control" name="project_name" id="project_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="project_description" class="form-label">Project Description:</label>
+                        <textarea class="form-control" name="project_description" id="project_description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="project_code" class="form-label">Project Code:</label>
+                            <input type="text" class="form-control" name="project_code" id="project_code" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="start_date" class="form-label">Start Date:</label>
+                            <input type="text" class="form-control datepicker" id="start_date" name="start_date" placeholder="DD-MM-YYYY" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="end_date" class="form-label">End Date:</label>
+                            <input type="text" class="form-control datepicker" name="end_date" id="end_date" placeholder="DD-MM-YYYY" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="start_time" class="form-label">Start Time:</label>
+                            <input type="time" class="form-control" name="start_time" id="start_time" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="end_time" class="form-label">End Time:</label>
+                            <input type="time" class="form-control" name="end_time" id="end_time" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-submit btn-block">Create Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+<script>
+    // Toggle Sidebar
+    const toggleSidebar = document.getElementById('toggle-sidebar');
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('content');
+
+    toggleSidebar.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        content.classList.toggle('collapsed');
+    });
+
+    $(document).ready(function () {
+
+        
+            $('.datepicker').datepicker({
+                format: 'dd-mm-yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
+        
+        // Your custom scripts can go here
+        $('#logout').on('click', function (event) {
+            event.preventDefault();
+
+            const accessToken = '{{token}}'
+            if (confirm("Are you sure you want to log out?")) {
+                $.ajax({
+                    url: "http://localhost:8000/pages/logout", // Replace with your actual logout endpoint
+                    type: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + accessToken // If required, include the authorization token
+                    },
+                    success: function (response) {
+                        // Handle successful logout
+                        alert("Logged out successfully!");
+                        // Optionally redirect to login page or homepage
+
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle errors
+                        window.location.href = "login";
+                    }
+                });
+            }
+
+        })
+
+    });
+
+</script>
+
+</html>

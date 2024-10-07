@@ -24,6 +24,15 @@ async def CreateSubTask(subTask: SubTask, current_user: dict = Depends(get_curre
         try:
             subTask = dict(subTask)
             subTask["created_by"] = current_user.id
+
+# ===============Not added to production server code===================Please ADD Later======================
+# { from here 
+            assigned_to_this_user = conn.local.assigned_task_empb.find_one({"user":current_user.id, "task":subTask["task"]})
+
+            if assigned_to_this_user is None:
+                return JSONResponse(content={"error":"you are not assigned to this task"}, status_code=status.HTTP_400_BAD_REQUEST)
+# to here }
+
             sub_task_object = conn.local.sub_task.insert_one(subTask)
         except Exception as e:
             return JSONResponse(content={"error": f'Task Not Created {e}'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
