@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mozi Tronics | Registration</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Tempus Dominus CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/tempus-dominus/6.2.7/css/tempus-dominus.min.css">
+
+
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+
+
+
+    <link rel="stylesheet" href="/static/css/custom_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+        <div class="toggle-button">
+            <i class="fas fa-bars"></i> <!-- Example icon or button for toggling -->
+        </div>
+
+        <a class="navbar-brand" href="#">Dashboard</a>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar collapsed" id="sidebar">
+        <h2 class="text-white text-center">Menu</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('Index') }}">Home</a>
+            </li>
+            {% if not token %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('Login') }}">Login</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="#">Messages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Settings</a>
+            </li>
+            {% if token %}
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="{{url_for('Logout')}}">Logout</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="content collapsed" id="content">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Edit Task</h1>
+                </div>
+                <div class="card-body">
+                    <form id="task-form">
+                        <div class="form-group">
+                            <label for="task_name" class="required">Task Name</label>
+                            <input type="text" class="form-control" name="task_name" id="task_name" value="{{task['task_name']}}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="task_description" class="required">Task Description</label>
+                            <textarea class="form-control" name="task_description" id="task_description"  rows="3"
+                                required>{{task['task_description']}}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="project" class="required">Project</label>
+                            <select class="form-control" id="project" required>
+                                <option value="" disabled="disabled" selected>Select an option</option>
+                                
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="start_date_and_time" class="required">Start Date & Time</label>
+                            <input type="datetime-local" class="form-control" name="start_date_and_time"
+                                id="start_date_and_time" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="target_end_date_and_time" class="required">Target End Date & Time</label>
+                            <input type="datetime-local" class="form-control" name="target_end_date_and_time"
+                                id="target_end_date_and_time" required>
+                        </div>
+
+                        
+
+                        <div class="form-group">
+                            <label for="task_owner" class="required">Task Owner</label>
+                            <select class="form-control" id="task_owner" name="task_owner" required>
+                                <option value="" disabled="disabled" selected>Select an option</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assigned" class="required">Assigned users</label>
+                            <select class="form-control" id="assigned" name="assigned" multiple required>
+                                <option value="" disabled="disabled">Select an option</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="assigned-names">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dependency" class="required">Dependency</label>
+                            <input type="number" class="form-control" name="dependency" id="dependency" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="target_duration" class="required">Target Duration</label>
+                            <input type="text" class="form-control" name="target_duration" id="target_duration"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="actual_end_date_and_time" class="required">Actual End Date & Time</label>
+                            <input type="datetime-local" class="form-control" name="actual_end_date_and_time"
+                                id="actual_end_date_and_time" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="actual_duration" class="required">Actual Duration</label>
+                            <input type="text" class="form-control" name="actual_duration" id="actual_duration"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status" class="required">Status</label>
+                            <select name="status" id="status" required>
+                                <option value="" disabled="disabled" >Select an option</option>
+                                <option value="open">open</option>
+                                <option value="closed">closed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="remarks" class="required">Remarks</label>
+                            <input type="text" class="form-control" name="remarks" id="remarks"
+                                required>
+                        </div>
+
+                        <div class="text-center">
+                            <input type="submit" id="submit" class="btn btn-primary" value="Edit Task">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tempus-dominus/6.2.7/js/tempus-dominus.min.js"></script> -->
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script src="/static/js/edit_task_form.js"></script>
+<script src="/static/js/main.js"></script>
+
+<script>
+    const accessToken = '{{ token }}';
+    const taskCreateUrl = '{{url_for("TaskCreate")}}';
+    const logoutUrl = "{{url_for('Logout')}}";
+    const loginUrl = "{{url_for('LoginPage')}}";
+    const editTaskUrl = "{{url_for('EditTask')}}"
+    
+    const task = {{ task | tojson }};
+    
+</script>
+
+</html>

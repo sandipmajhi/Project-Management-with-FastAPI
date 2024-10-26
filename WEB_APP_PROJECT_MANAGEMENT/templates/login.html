@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mozi Tronics | Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/custom_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="toggle-button">
+            <i class="fas fa-bars"></i> <!-- Example icon or button for toggling -->
+        </div>
+        <a class="navbar-brand" href="#">Dashboard</a>
+    </nav>
+
+    <div class="sidebar collapsed" id="sidebar">
+        <h2 class="text-white text-center">Menu</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('Index') }}">Home</a>
+            </li>
+            {% if not token %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('Login') }}">Login</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="#">Messages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Settings</a>
+            </li>
+            {% if token %}
+            <li class="nav-item">
+                <a class="nav-link" id="logout" href="{{url_for('Logout')}}">Logout</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="content collapsed" id="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="login-card card">
+                        <div class="card-body">
+                            <h3 class="card-title text-center">Welcome Back!</h3>
+                            <p class="text-center text-muted">Please login to your account</p>
+                            <hr>
+                            <form action="{{ url_for('Login') }}" method="post">
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" class="form-control" name="email" id="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" name="password" id="password" required>
+                                </div>
+                                <button type="submit" id="submit" class="btn btn-custom btn-block">Login</button>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const accessToken = '{{token}}'
+        const logoutUrl = "{{url_for('Logout')}}";
+        const loginUrl = "{{url_for('LoginPage')}}";
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="/static/js/main.js"></script>
+
+</body>
+
+</html>
